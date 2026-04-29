@@ -3,8 +3,24 @@ import { createRouteSupabaseClient } from '@/lib/supabase-route'
 
 async function getCurrentUser(request: NextRequest, response: NextResponse) {
   const supabase = createRouteSupabaseClient(request, response)
+  try {
+    console.log('Team API - incoming request cookies:', request.cookies.getAll().map(c => ({ name: c.name })))
+  } catch (logErr) {
+    // ignore
+  }
+
   const { data: { user }, error } = await supabase.auth.getUser()
-  if (error || !user) throw new Error('Unauthorized')
+  try {
+    console.log('Team API - supabase.auth.getUser result:', { user: user ?? null, error: error?.message ?? null })
+  } catch (logErr) {
+    // ignore
+  }
+
+  if (error || !user) {
+    try { console.log('Team API - Unauthorized: no user or error from supabase') } catch {}
+    throw new Error('Unauthorized')
+  }
+
   return { supabase, user }
 }
 
