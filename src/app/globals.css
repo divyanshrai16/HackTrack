@@ -1,0 +1,134 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Theme Colors ──────────────────────────────────────────────────────── */
+:root {
+  --color-accent: #00d4aa;
+  /* Dark theme (default) */
+  --bg-primary: #090c14;
+  --bg-secondary: #0f1825;
+  --bg-tertiary: #070c18;
+  --border-dim: #1a2740;
+  --border-mid: #1e3a5f;
+  --text-primary: #e2e8f0;
+  --text-secondary: #8ba3c0;
+  --text-muted: #4b6080;
+  /* Accent gradients */
+  --grad-cyan: linear-gradient(135deg, #00d4aa 0%, #0ea5e9 100%);
+  --grad-purple: linear-gradient(135deg, #8b5cf6 0%, #d946ef 100%);
+  --grad-neon: linear-gradient(135deg, #ff006e 0%, #00d4aa 100%);
+}
+
+html.light {
+  /* Light theme */
+  --bg-primary: #f8f9fa;
+  --bg-secondary: #ffffff;
+  --bg-tertiary: #f2f2f2;
+  --border-dim: #e1e8ed;
+  --border-mid: #cbd5e1;
+  --text-primary: #1e293b;
+  --text-secondary: #475569;
+  --text-muted: #94a3b8;
+}
+
+/* ─── Scrollbar ──────────────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: #111827; }
+::-webkit-scrollbar-thumb { background: #1e3a5f; border-radius: 2px; }
+
+/* ─── Focus Rings ────────────────────────────────────────────────────────── */
+*:focus-visible {
+  outline: 2px solid #00d4aa;
+  outline-offset: 2px;
+}
+
+/* ─── Form Inputs ─────────────────────────────────────────────────────────── */
+input, select, textarea {
+  @apply bg-bg-tertiary border border-border-dim text-text-primary rounded-md px-3 py-2 text-xs font-mono w-full outline-none transition-colors;
+}
+input:focus, select:focus, textarea:focus {
+  @apply border-accent-green;
+}
+input::placeholder, textarea::placeholder {
+  @apply text-text-muted;
+}
+
+/* ─── Utility classes ────────────────────────────────────────────────────── */
+@layer components {
+  .card {
+    @apply bg-bg-secondary border border-border-dim rounded-xl p-4 transition-all duration-150;
+  }
+  .card:hover {
+    @apply border-border-mid -translate-y-px;
+  }
+  .btn-primary {
+    @apply bg-accent-green text-black font-bold text-xs tracking-widest rounded-md px-4 py-2 border-none cursor-pointer transition-all hover:brightness-110 active:scale-95;
+  }
+  .btn-ghost {
+    @apply bg-transparent text-text-secondary border border-border-dim text-xs rounded-md px-3 py-2 cursor-pointer transition-all hover:border-accent-green hover:text-accent-green font-mono;
+  }
+  .btn-danger {
+    @apply bg-transparent text-accent-red border border-red-900/50 text-xs rounded-md px-3 py-2 cursor-pointer transition-all hover:bg-red-900/20 font-mono;
+  }
+  .tag {
+    @apply inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold tracking-widest;
+  }
+  .sidebar-item {
+    @apply flex items-center gap-2.5 px-3 py-2 rounded-md text-text-muted text-xs cursor-pointer transition-all hover:bg-bg-secondary hover:text-text-primary border-l-2 border-transparent font-mono w-full text-left;
+  }
+  .sidebar-item.active {
+    @apply bg-bg-secondary text-accent-green border-l-accent-green;
+  }
+  .tab-btn {
+    @apply px-4 py-2 text-xs border-b-2 border-transparent text-text-muted transition-all tracking-widest hover:text-text-primary cursor-pointer bg-transparent border-t-0 border-l-0 border-r-0 font-mono;
+  }
+  .tab-btn.active {
+    @apply text-accent-green border-b-accent-green;
+  }
+  .progress-bar {
+    @apply h-1 bg-border-dim rounded-full overflow-hidden;
+  }
+  .progress-fill {
+    @apply h-full rounded-full transition-all duration-500;
+    background: linear-gradient(90deg, #00d4aa, #0ea5e9);
+  }
+  .stat-card {
+    @apply bg-bg-tertiary border border-border-dim rounded-lg p-3;
+  }
+  .stat-num {
+    @apply text-2xl font-bold text-text-primary tracking-tight;
+  }
+  .stat-label {
+    @apply text-xs text-text-muted tracking-widest uppercase mt-0.5;
+  }
+  .avatar {
+    @apply rounded-full flex items-center justify-center font-bold flex-shrink-0;
+  }
+  .round-card {
+    @apply bg-bg-tertiary border border-border-dim rounded-lg p-3.5 mb-2;
+  }
+  .kanban-col {
+    @apply bg-bg-tertiary border border-border-dim rounded-lg p-3 flex-1 min-w-0;
+  }
+  .task-item {
+    @apply bg-bg-secondary border border-border-dim rounded-md p-2.5 mb-2 cursor-pointer transition-all hover:border-border-mid;
+  }
+  .modal-backdrop {
+    @apply fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4;
+  }
+  .modal {
+    @apply bg-bg-secondary border border-border-mid rounded-xl w-full max-w-xl max-h-[90vh] overflow-y-auto;
+  }
+  .divider {
+    @apply h-px bg-border-dim my-3;
+  }
+  .platform-badge {
+    @apply inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-xs font-semibold bg-bg-tertiary border border-border-dim text-text-secondary tracking-wider;
+  }
+  .notification-dot {
+    @apply w-1.5 h-1.5 rounded-full animate-pulse-dot flex-shrink-0;
+  }
+  .glow-green { box-shadow: 0 0 12px rgba(0, 212, 170, 0.2); }
+  .glow-blue  { box-shadow: 0 0 12px rgba(14, 165, 233, 0.2); }
+}
