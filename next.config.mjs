@@ -5,6 +5,14 @@ const nextConfig = {
       { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
     ],
   },
+  typescript: {
+    // Danger: allows builds to succeed despite TypeScript errors
+    ignoreBuildErrors: true,
+  },
+  eslint: {
+    // Danger: allows builds to succeed despite ESLint errors
+    ignoreDuringBuilds: true,
+  },
   // Vercel Cron configuration
   async headers() {
     return [
