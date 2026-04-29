@@ -20,11 +20,15 @@ export async function GET(request: NextRequest) {
         getAll() {
           return request.cookies.getAll()
         },
-        setAll(cookiesToSet: { name: string; value: string; options: CookieOptions }[]) {
-          cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options)
-          })
-        },
+        setAll(cookiesToSet: Array<{ name: string; value: string; options: any }>) {
+              try {
+                cookiesToSet.forEach(({ name, value, options }) => {
+                  response.cookies.set(name, value, options)
+                })
+              } catch (error) {
+                // This handles cases where setAll is called from a Server Component
+              }
+            },
       },
     },
   )
