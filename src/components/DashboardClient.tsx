@@ -194,7 +194,7 @@ export default function DashboardClient({ user, profile, initialHackathons, init
   async function handleDeleteHackathon(id: string) {
     try {
       if (!window.confirm('Delete this hackathon? This cannot be undone.')) return
-      const response = await fetch(`/api/hackathons/${id}`, { method: 'DELETE' })
+      const response = await fetch(`/api/hackathons/${id}`, { method: 'DELETE', credentials: 'include' })
       if (!response.ok) {
         toast.error('Failed to delete hackathon')
         return
@@ -230,6 +230,7 @@ export default function DashboardClient({ user, profile, initialHackathons, init
     try {
       const response = await fetch(`/api/hackathons/${selected.id}`, {
         method: 'PATCH',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editData),
       })
@@ -264,7 +265,7 @@ export default function DashboardClient({ user, profile, initialHackathons, init
 
   async function handleCloneHackathon(id: string) {
     try {
-      const response = await fetch(`/api/hackathons/${id}/clone`, { method: 'POST' })
+      const response = await fetch(`/api/hackathons/${id}/clone`, { method: 'POST', credentials: 'include' })
       const result = await response.json()
       if (!response.ok) throw new Error(result.error ?? 'Failed to clone hackathon')
 
@@ -281,6 +282,7 @@ export default function DashboardClient({ user, profile, initialHackathons, init
     try {
       const response = await fetch(`/api/rounds/${roundId}`, {
         method: 'PATCH',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
       })
@@ -307,6 +309,7 @@ export default function DashboardClient({ user, profile, initialHackathons, init
     try {
       const response = await fetch('/api/tasks', {
         method: 'PATCH',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: taskId, status }),
       })
@@ -421,6 +424,7 @@ export default function DashboardClient({ user, profile, initialHackathons, init
     try {
       const response = await fetch('/api/hackathons', {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       })
@@ -467,6 +471,7 @@ export default function DashboardClient({ user, profile, initialHackathons, init
     try {
       const response = await fetch(`/api/hackathons/${selected.id}/team`, {
         method: 'POST',
+        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, role: inviteRole }),
       })
@@ -500,6 +505,7 @@ export default function DashboardClient({ user, profile, initialHackathons, init
     try {
       const response = await fetch(`/api/hackathons/${selected.id}/team?email=${encodeURIComponent(email)}`, {
         method: 'DELETE',
+        credentials: 'include',
       })
       const payload = await response.json()
       if (!response.ok) throw new Error(payload.error ?? 'Failed to remove teammate')
@@ -541,7 +547,7 @@ export default function DashboardClient({ user, profile, initialHackathons, init
           team_emails: [],
         }
 
-        const res = await fetch('/api/hackathons', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+        const res = await fetch('/api/hackathons', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
         const json = await res.json()
         if (!res.ok) throw new Error(json.error ?? 'Failed to import')
         created.push(json.data)
