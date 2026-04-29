@@ -22,8 +22,14 @@ export async function GET(request: NextRequest) {
           },
           setAll(cookiesToSet: { name: string; value: string; options?: Record<string, unknown> }[]) {
             cookiesToSet.forEach(({ name, value, options }) => {
-              response.cookies.set(name, value, options as any)
-            })
+                const safeOptions = {
+                  path: '/',
+                  sameSite: 'lax',
+                  secure: true,
+                  ...(options ?? {}),
+                }
+                response.cookies.set(name, value, safeOptions as any)
+              })
           },
         },
     },

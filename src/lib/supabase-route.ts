@@ -12,7 +12,13 @@ export function createRouteSupabaseClient(request: NextRequest, response: NextRe
         },
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value, options }) => {
-            response.cookies.set(name, value, options)
+            const safeOptions = {
+              path: '/',
+              sameSite: 'lax',
+              secure: true,
+              ...(options ?? {}),
+            }
+            response.cookies.set(name, value, safeOptions as any)
           })
         },
       },
