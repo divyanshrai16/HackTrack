@@ -1,17 +1,30 @@
 "use client"
 
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase'
 import toast from 'react-hot-toast'
 import { ThemeToggle } from '@/components/ThemeToggle'
 
+export const dynamic = 'force-dynamic'
+
 export default function ProfilePage({}: {}) {
-  const supabase = createClient()
-  const user = supabase.auth.user()
-  const [name, setName] = useState<string>(user?.user_metadata?.full_name ?? '')
-  const [avatar, setAvatar] = useState<string>(user?.user_metadata?.avatar_url ?? '')
-  const [bio, setBio] = useState<string>(user?.user_metadata?.bio ?? '')
+  const [user, setUser] = useState<any>(null)
+  const [name, setName] = useState<string>('')
+  const [avatar, setAvatar] = useState<string>('')
+  const [bio, setBio] = useState<string>('')
+  const [ready, setReady] = useState(false)
   const [saving, setSaving] = useState(false)
+
+  useEffect(() => {
+    const supabase = createClient()
+    const currentUser = supabase.auth.user()
+
+    setUser(currentUser)
+    setName(currentUser?.user_metadata?.full_name ?? '')
+    setAvatar(currentUser?.user_metadata?.avatar_url ?? '')
+    setBio(currentUser?.user_metadata?.bio ?? '')
+    setReady(true)
+  }, [])
 
   async function handleSave() {
     if (!user) return toast.error('Not signed in')
@@ -40,6 +53,7 @@ export default function ProfilePage({}: {}) {
       </div>
 
       <div className="max-w-2xl">
+        {!ready ? <p className="mb-4 text-sm text-text-muted">Loading profile...</p> : null}
         <label className="block text-sm text-text-muted mb-1">Full name</label>
         <input value={name} onChange={e => setName(e.target.value)} placeholder="Your full name" className="mb-4" />
 
