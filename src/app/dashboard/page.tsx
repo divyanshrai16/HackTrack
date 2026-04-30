@@ -6,6 +6,7 @@ import DashboardClient from '../../components/DashboardClient'
 export default async function DashboardPage() {
   const supabase = await createServerSupabaseClient()
   const { data: { user } } = await supabase.auth.getUser()
+  const { data: { session } } = await supabase.auth.getSession()
 
   if (!user) redirect('/')
 
@@ -65,5 +66,13 @@ export default async function DashboardPage() {
     ).values(),
   )
 
-  return <DashboardClient user={user} profile={profile} initialHackathons={hackathons} initialNotifications={(notifications ?? []) as Notification[]} />
+  return (
+    <DashboardClient
+      user={user}
+      profile={profile}
+      initialHackathons={hackathons}
+      initialNotifications={(notifications ?? []) as Notification[]}
+      initialAccessToken={session?.access_token ?? null}
+    />
+  )
 }

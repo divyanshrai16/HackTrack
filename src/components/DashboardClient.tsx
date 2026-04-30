@@ -16,6 +16,7 @@ type Props = {
   profile: Profile | null
   initialHackathons: HackathonFull[]
   initialNotifications: Notification[]
+  initialAccessToken?: string | null
 }
 
 function Avatar({ name, url, size = 32, index = 0 }: { name: string; url?: string | null; size?: number; index?: number }) {
@@ -47,7 +48,7 @@ function ProgressBar({ value, color = '#00d4aa' }: { value: number; color?: stri
   return <div className="h-1.5 rounded-full bg-border-dim overflow-hidden"><div className="h-full rounded-full" style={{ width: `${value}%`, background: color }} /></div>
 }
 
-export default function DashboardClient({ user, profile, initialHackathons, initialNotifications }: Props) {
+export default function DashboardClient({ user, profile, initialHackathons, initialNotifications, initialAccessToken }: Props) {
   const router = useRouter()
   const [hackathons, setHackathons] = useState(initialHackathons)
   const [selectedId, setSelectedId] = useState<string | null>(initialHackathons[0]?.id ?? null)
@@ -94,11 +95,10 @@ export default function DashboardClient({ user, profile, initialHackathons, init
   const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   async function authRequestInit(init: RequestInit = {}): Promise<RequestInit> {
-    const supabase = createClient()
-    const { data: { session } } = await supabase.auth.getSession()
     const headers = new Headers(init.headers)
-    if (session?.access_token) {
-      headers.set('Authorization', `Bearer ${session.access_token}`)
+    const token = initialAccessToken ?? (await createClient().auth.getSession()).data.session?.access_token ?? null
+    if (token) {
+      headers.set('Authorization', `Bearer ${token}`)
     }
     return {
       ...init,
