@@ -1,14 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import type { HackathonFull, CreateHackathonPayload } from '@/types'
-import { createRouteSupabaseClient } from '@/lib/supabase-route'
-
-async function getCurrentUser(request: NextRequest, response: NextResponse) {
-  const supabase = createRouteSupabaseClient(request, response)
-  const { data: { user }, error } = await supabase.auth.getUser()
-  if (error || !user) throw new Error('Unauthorized')
-  return { supabase, user }
-}
+import { getRouteUser, createRouteSupabaseClient } from '@/lib/supabase-route'
 
 function normalizeHackathon(row: any): HackathonFull {
   return {
@@ -56,7 +49,7 @@ export async function GET(request: NextRequest) {
   const response = NextResponse.json({ data: [] })
 
   try {
-    const { user } = await getCurrentUser(request, response)
+    const { user } = await getRouteUser(request, response)
     const hackathons = await loadHackathonsForUser(request, response, user.id, user.email ?? null)
     return NextResponse.json({ data: hackathons })
   } catch (error) {
@@ -68,7 +61,7 @@ export async function POST(request: NextRequest) {
   const response = NextResponse.json({ data: null })
 
   try {
-    const { supabase, user } = await getCurrentUser(request, response)
+    const { supabase, user } = await getRouteUser(request, response)
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
     if (!serviceRoleKey || serviceRoleKey === 'your-service-role-key-here') {
       return NextResponse.json(

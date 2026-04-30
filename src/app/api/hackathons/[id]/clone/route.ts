@@ -1,12 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
-import { createRouteSupabaseClient } from '@/lib/supabase-route'
+import { getRouteUser } from '@/lib/supabase-route'
 
 async function getCurrentUser(request: NextRequest, response: NextResponse) {
-  const supabase = createRouteSupabaseClient(request, response)
-  const { data: { user }, error } = await supabase.auth.getUser()
-  if (error || !user) throw new Error('Unauthorized')
-  return { supabase, user }
+  return await getRouteUser(request, response)
 }
 
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {

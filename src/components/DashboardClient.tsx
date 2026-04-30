@@ -93,6 +93,20 @@ export default function DashboardClient({ user, profile, initialHackathons, init
   ])
   const refreshTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
+  async function authRequestInit(init: RequestInit = {}): Promise<RequestInit> {
+    const supabase = createClient()
+    const { data: { session } } = await supabase.auth.getSession()
+    const headers = new Headers(init.headers)
+    if (session?.access_token) {
+      headers.set('Authorization', `Bearer ${session.access_token}`)
+    }
+    return {
+      ...init,
+      credentials: 'include',
+      headers,
+    }
+  }
+
   const userName = profile?.full_name ?? user.email?.split('@')[0] ?? 'Dev'
   const selected = hackathons.find(h => h.id === selectedId) ?? null
   const notifications = initialNotifications
@@ -194,7 +208,7 @@ export default function DashboardClient({ user, profile, initialHackathons, init
   async function handleDeleteHackathon(id: string) {
     try {
       if (!window.confirm('Delete this hackathon? This cannot be undone.')) return
-      const response = await fetch(`/api/hackathons/${id}`, { method: 'DELETE', credentials: 'include' })
+      const response = await fetch(`/api/hackathons/${id}`, await authRequestInit({ method: 'DELETE' }))
       if (!response.ok) {
         toast.error('Failed to delete hackathon')
         return
@@ -228,12 +242,11 @@ export default function DashboardClient({ user, profile, initialHackathons, init
 
     setEditing(true)
     try {
-      const response = await fetch(`/api/hackathons/${selected.id}`, {
+      const response = await fetch(`/api/hackathons/${selected.id}`, await authRequestInit({
         method: 'PATCH',
-        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editData),
-      })
+      }))
       const result = await response.json()
       if (!response.ok) throw new Error(result.error ?? 'Failed to update hackathon')
 
@@ -265,7 +278,7 @@ export default function DashboardClient({ user, profile, initialHackathons, init
 
   async function handleCloneHackathon(id: string) {
     try {
-      const response = await fetch(`/api/hackathons/${id}/clone`, { method: 'POST', credentials: 'include' })
+      const response = await fetch(`/api/hackathons/${id}/clone`, await authRequestInit({ method: 'POST' }))
       const result = await response.json()
       if (!response.ok) throw new Error(result.error ?? 'Failed to clone hackathon')
 
@@ -280,12 +293,11 @@ export default function DashboardClient({ user, profile, initialHackathons, init
   async function handleUpdateRoundStatus(roundId: string, status: RoundStatus) {
     if (!selected) return
     try {
-      const response = await fetch(`/api/rounds/${roundId}`, {
+      const response = await fetch(`/api/rounds/${roundId}`, await authRequestInit({
         method: 'PATCH',
-        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status }),
-      })
+      }))
       const payload = await response.json()
       if (!response.ok) throw new Error(payload.error ?? 'Failed to update round')
 
@@ -307,12 +319,11 @@ export default function DashboardClient({ user, profile, initialHackathons, init
     if (!selected) return
 
     try {
-      const response = await fetch('/api/tasks', {
+      const response = await fetch('/api/tasks', await authRequestInit({
         method: 'PATCH',
-        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: taskId, status }),
-      })
+      }))
       const payload = await response.json()
       if (!response.ok) throw new Error(payload.error ?? 'Failed to update task')
 
@@ -422,12 +433,11 @@ export default function DashboardClient({ user, profile, initialHackathons, init
 
     setCreating(true)
     try {
-      const response = await fetch('/api/hackathons', {
+      const response = await fetch('/api/hackathons', await authRequestInit({
         method: 'POST',
-        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
-      })
+      }))
       const result = await response.json()
       if (!response.ok) {
         const extra = [result.details, result.hint, result.code].filter(Boolean).join(' | ')
@@ -469,12 +479,11 @@ export default function DashboardClient({ user, profile, initialHackathons, init
 
     setInviting(true)
     try {
-      const response = await fetch(`/api/hackathons/${selected.id}/team`, {
+      const response = await fetch(`/api/hackathons/${selected.id}/team`, await authRequestInit({
         method: 'POST',
-        credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, role: inviteRole }),
-      })
+      }))
 
       const payload = await response.json()
       if (!response.ok) throw new Error(payload.error ?? 'Failed to invite teammate')
@@ -503,10 +512,9 @@ export default function DashboardClient({ user, profile, initialHackathons, init
     if (!window.confirm(`Remove ${email} from this hackathon?`)) return
 
     try {
-      const response = await fetch(`/api/hackathons/${selected.id}/team?email=${encodeURIComponent(email)}`, {
+      const response = await fetch(`/api/hackathons/${selected.id}/team?email=${encodeURIComponent(email)}`, await authRequestInit({
         method: 'DELETE',
-        credentials: 'include',
-      })
+      }))
       const payload = await response.json()
       if (!response.ok) throw new Error(payload.error ?? 'Failed to remove teammate')
 
@@ -547,7 +555,7 @@ export default function DashboardClient({ user, profile, initialHackathons, init
           team_emails: [],
         }
 
-        const res = await fetch('/api/hackathons', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) })
+        const res = await fetch('/api/hackathons', await authRequestInit({ method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }))
         const json = await res.json()
         if (!res.ok) throw new Error(json.error ?? 'Failed to import')
         created.push(json.data)
@@ -670,7 +678,7 @@ export default function DashboardClient({ user, profile, initialHackathons, init
               if (!window.confirm('Send email reminders to team members for rounds due in next 24 hours?')) return
               try {
                 setSendingReminders(true)
-                const res = await fetch('/api/reminders/send', { method: 'POST' })
+                const res = await fetch('/api/reminders/send', await authRequestInit({ method: 'POST' }))
                 const json = await res.json()
                 if (!res.ok) throw new Error(json.error || 'Failed to send reminders')
                 toast.success(`Sent ${json.data?.sent ?? 0} emails`)
