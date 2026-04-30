@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient as createAdminClient } from '@supabase/supabase-js'
 import type { HackathonFull, CreateHackathonPayload } from '@/types'
-import { getRouteUser, createRouteSupabaseClient } from '@/lib/supabase-route'
+import { getRouteUser } from '@/lib/supabase-route'
 
 function normalizeHackathon(row: any): HackathonFull {
   return {
@@ -14,16 +14,15 @@ function normalizeHackathon(row: any): HackathonFull {
   }
 }
 
-async function loadHackathonsForUser(request: NextRequest, response: NextResponse, userId: string, email: string | null) {
-  const supabase = createRouteSupabaseClient(request, response)
+async function loadHackathonsForUser(admin: ReturnType<typeof createAdminClient>, userId: string, email: string | null) {
 
   const [{ data: owned }, { data: teamLinks }] = await Promise.all([
-    supabase
+      admin
       .from('hackathons')
       .select('*, rounds(*), team_members(*), resources(*), tasks(*)')
       .eq('owner_id', userId)
       .order('created_at', { ascending: false }),
-    supabase
+      admin
       .from('team_members')
       .select('hackathon_id')
       .eq('email', email ?? ''),
@@ -32,7 +31,7 @@ async function loadHackathonsForUser(request: NextRequest, response: NextRespons
   const teamHackathonIds = Array.from(new Set((teamLinks ?? []).map((link: { hackathon_id: string }) => link.hackathon_id)))
 
   const { data: teamHackathons } = teamHackathonIds.length
-    ? await supabase
+    ? await admin
         .from('hackathons')
         .select('*, rounds(*), team_members(*), resources(*), tasks(*)')
         .in('id', teamHackathonIds)
@@ -50,7 +49,12 @@ export async function GET(request: NextRequest) {
 
   try {
     const { user } = await getRouteUser(request, response)
-    const hackathons = await loadHackathonsForUser(request, response, user.id, user.email ?? null)
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    if (!serviceRoleKey || serviceRoleKey === 'your-service-role-key-here') {
+      return NextResponse.json({ error: 'Server config error: missing SUPABASE_SERVICE_ROLE_KEY in .env.local' }, { status: 500 })
+    }
+    const admin = createAdminClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceRoleKey, { auth: { persistSession: false } })
+    const hackathons = await loadHackathonsForUser(admin, user.id, user.email ?? null)
     return NextResponse.json({ data: hackathons })
   } catch (error) {
     return NextResponse.json({ error: error instanceof Error ? error.message : 'Unauthorized' }, { status: 401 })
@@ -61,7 +65,7 @@ export async function POST(request: NextRequest) {
   const response = NextResponse.json({ data: null })
 
   try {
-    const { supabase, user } = await getRouteUser(request, response)
+    const { user } = await getRouteUser(request, response)
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
     if (!serviceRoleKey || serviceRoleKey === 'your-service-role-key-here') {
       return NextResponse.json(
@@ -87,7 +91,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Some existing accounts may predate the auth trigger. Ensure FK owner profile exists.
-    const { data: existingProfile, error: profileLookupError } = await supabase
+    const { data: existingProfile, error: profileLookupError } = await admin
       .from('profiles')
       .select('id')
       .eq('id', user.id)

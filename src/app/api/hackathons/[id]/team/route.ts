@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { getRouteUser } from '@/lib/supabase-route'
 
 async function getCurrentUser(request: NextRequest, response: NextResponse) {
@@ -8,11 +9,17 @@ async function getCurrentUser(request: NextRequest, response: NextResponse) {
 export async function POST(request: NextRequest, { params }: { params: { id: string } }) {
   const response = NextResponse.json({ data: null })
   try {
-    const { supabase, user } = await getCurrentUser(request, response)
+    const { user } = await getCurrentUser(request, response)
     const { id } = params
     const body = await request.json() as { email: string; role?: string }
     const email = body.email?.trim().toLowerCase()
     const role = body.role?.trim() || 'Member'
+
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    if (!serviceRoleKey || serviceRoleKey === 'your-service-role-key-here') {
+      return NextResponse.json({ error: 'Server config error: missing SUPABASE_SERVICE_ROLE_KEY in .env.local' }, { status: 500 })
+    }
+    const supabase = createAdminClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceRoleKey, { auth: { persistSession: false } })
 
     if (!email) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 })
@@ -87,10 +94,16 @@ export async function POST(request: NextRequest, { params }: { params: { id: str
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   const response = NextResponse.json({ data: null })
   try {
-    const { supabase, user } = await getCurrentUser(request, response)
+    const { user } = await getCurrentUser(request, response)
     const { id } = params
     const { searchParams } = new URL(request.url)
     const email = searchParams.get('email')?.trim().toLowerCase()
+
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    if (!serviceRoleKey || serviceRoleKey === 'your-service-role-key-here') {
+      return NextResponse.json({ error: 'Server config error: missing SUPABASE_SERVICE_ROLE_KEY in .env.local' }, { status: 500 })
+    }
+    const supabase = createAdminClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceRoleKey, { auth: { persistSession: false } })
 
     if (!email) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 })

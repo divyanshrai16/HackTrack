@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { getRouteUser } from '@/lib/supabase-route'
 
 async function getCurrentUser(request: NextRequest, response: NextResponse) {
@@ -8,7 +9,12 @@ async function getCurrentUser(request: NextRequest, response: NextResponse) {
 export async function POST(request: NextRequest) {
   const response = NextResponse.json({ data: null })
   try {
-    const { supabase, user } = await getCurrentUser(request, response)
+    const { user } = await getCurrentUser(request, response)
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    if (!serviceRoleKey || serviceRoleKey === 'your-service-role-key-here') {
+      return NextResponse.json({ error: 'Server config error: missing SUPABASE_SERVICE_ROLE_KEY in .env.local' }, { status: 500 })
+    }
+    const supabase = createAdminClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceRoleKey, { auth: { persistSession: false } })
     const body = await request.json() as {
       hackathon_id: string
       title: string
@@ -44,7 +50,12 @@ export async function POST(request: NextRequest) {
 export async function PATCH(request: NextRequest) {
   const response = NextResponse.json({ data: null })
   try {
-    const { supabase } = await getCurrentUser(request, response)
+    await getCurrentUser(request, response)
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    if (!serviceRoleKey || serviceRoleKey === 'your-service-role-key-here') {
+      return NextResponse.json({ error: 'Server config error: missing SUPABASE_SERVICE_ROLE_KEY in .env.local' }, { status: 500 })
+    }
+    const supabase = createAdminClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceRoleKey, { auth: { persistSession: false } })
     const body = await request.json() as {
       id: string
       status?: 'todo' | 'in-progress' | 'done'

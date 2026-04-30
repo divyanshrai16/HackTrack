@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { createClient as createAdminClient } from '@supabase/supabase-js'
 import { getRouteUser } from '@/lib/supabase-route'
 
 async function getCurrentUser(request: NextRequest, response: NextResponse) {
@@ -8,7 +9,12 @@ async function getCurrentUser(request: NextRequest, response: NextResponse) {
 export async function POST(request: NextRequest) {
   try {
     const response = NextResponse.json({ data: null })
-    const { supabase, user } = await getCurrentUser(request, response)
+    const { user } = await getCurrentUser(request, response)
+    const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+    if (!serviceRoleKey || serviceRoleKey === 'your-service-role-key-here') {
+      return NextResponse.json({ error: 'Server not configured: missing SUPABASE_SERVICE_ROLE_KEY' }, { status: 500 })
+    }
+    const supabase = createAdminClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, serviceRoleKey, { auth: { persistSession: false } })
 
     const now = new Date()
     const cutoff = new Date(now.getTime() + 24 * 60 * 60 * 1000) // next 24h
