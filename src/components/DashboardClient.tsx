@@ -666,57 +666,64 @@ export default function DashboardClient({ user, profile, initialHackathons, init
       )}
 
       <main className="min-w-0 flex-1 overflow-y-auto">
-        <header className="sticky top-0 z-10 border-b border-border-mid bg-gradient-to-r from-bg-primary via-bg-secondary to-bg-primary/80 backdrop-blur px-3 sm:px-6 py-4 flex items-start gap-3 justify-between">
-          <button className="p-2 text-xl" onClick={() => setSidebarOpen(v => !v)} aria-label="Toggle menu">☰</button>
-          <div className="min-w-0">
-            <div className="text-xs tracking-[0.35em] text-accent-green font-bold">SIGNED IN</div>
-            <h1 className="text-xl sm:text-2xl font-black mt-1 bg-gradient-to-r from-accent-green via-accent-blue to-accent-purple bg-clip-text text-transparent">HackTrack Dashboard</h1>
-            <p className="text-xs sm:text-sm text-text-secondary mt-1">Welcome back, <span className="inline-block max-w-[32vw] sm:max-w-[26rem] align-bottom truncate text-accent-green font-semibold" title={user.email ?? ''}>{user.email}</span>.</p>
-          </div>
+        <header className="sticky top-0 z-10 border-b border-border-mid bg-gradient-to-r from-bg-primary via-bg-secondary to-bg-primary/80 backdrop-blur">
+          <div className="px-3 sm:px-6 py-4 sm:py-5 space-y-3 sm:space-y-4">
+            <div className="flex flex-wrap items-start justify-between gap-3">
+              <div className="flex items-start gap-3 min-w-0">
+                <button className="p-2 text-xl shrink-0" onClick={() => setSidebarOpen(v => !v)} aria-label="Toggle menu">☰</button>
+                <div className="min-w-0">
+                  <div className="text-xs tracking-[0.35em] text-accent-green font-bold">SIGNED IN</div>
+                  <h1 className="text-xl sm:text-2xl font-black mt-1 bg-gradient-to-r from-accent-green via-accent-blue to-accent-purple bg-clip-text text-transparent">HackTrack Dashboard</h1>
+                  <p className="text-xs sm:text-sm text-text-secondary mt-1 max-w-[42rem] truncate">Welcome back, <span className="text-accent-green font-semibold" title={user.email ?? ''}>{user.email}</span>.</p>
+                </div>
+              </div>
 
-          <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end shrink-0">
-            <div className="relative w-36 sm:w-72 max-w-[42vw]">
-              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search hackathons..." className="pl-8 border-accent-green/30 focus:border-accent-green" />
-              <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-accent-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
+              <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3 shrink-0 w-full sm:w-auto">
+                <ThemeToggle />
+                <button onClick={() => setShowNotifications(v => !v)} className="btn-ghost relative p-2 hover:text-accent-green" aria-label="Notifications">
+                  🔔
+                  {notifications.some(n => !n.is_read) && <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-accent-green animate-pulse" />}
+                </button>
+                <button onClick={() => setShowCreate(v => !v)} className={cn('btn-primary text-[11px] sm:text-sm px-2.5 sm:px-4', showCreate ? 'bg-accent-red hover:brightness-125' : '')}>{showCreate ? 'Close' : '+ Add'}</button>
+                <button onClick={() => setShowBulkImport(v => !v)} className={cn('btn-ghost hidden sm:inline-flex', showBulkImport ? 'text-accent-red' : '')}>Bulk Import</button>
+                <button onClick={async () => {
+                  if (!window.confirm('Send email reminders to team members for rounds due in next 24 hours?')) return
+                  try {
+                    setSendingReminders(true)
+                    const res = await fetch('/api/reminders/send', await authRequestInit({ method: 'POST' }))
+                    const json = await res.json()
+                    if (!res.ok) throw new Error(json.error || 'Failed to send reminders')
+                    toast.success(`Sent ${json.data?.sent ?? 0} emails`)
+                  } catch (err: any) {
+                    toast.error(err?.message ?? 'Failed to send reminders')
+                  } finally {
+                    setSendingReminders(false)
+                  }
+                }} className={cn('btn-ghost hidden lg:inline-flex', sendingReminders ? 'text-accent-green' : '')}>{sendingReminders ? 'Sending…' : 'Send Reminders'}</button>
+                <Link href="/" className="btn-ghost hidden sm:inline-flex hover:text-accent-blue">Home</Link>
+              </div>
             </div>
-            <div className="hidden md:flex items-center gap-2">
-              <select value={sortBy} onChange={e => setSortBy(e.target.value as any)} className="text-sm px-2 py-1 border border-border-dim bg-bg-secondary rounded">
+
+            <div className="grid gap-2 sm:gap-3 xl:grid-cols-[minmax(0,1.5fr)_repeat(3,minmax(0,1fr))]">
+              <div className="relative min-w-0 xl:col-span-1">
+                <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search hackathons..." className="pl-8 border-accent-green/30 focus:border-accent-green w-full" />
+                <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-accent-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
+              </div>
+              <select value={sortBy} onChange={e => setSortBy(e.target.value as any)} className="text-sm px-2 py-1 border border-border-dim bg-bg-secondary rounded w-full">
                 <option value="created">Sort: Newest</option>
                 <option value="deadline">Sort: Next Deadline</option>
                 <option value="completion">Sort: Completion %</option>
                 <option value="team">Sort: Team Size</option>
               </select>
-              <select value={platformFilter} onChange={e => setPlatformFilter(e.target.value)} className="text-sm px-2 py-1 border border-border-dim bg-bg-secondary rounded">
+              <select value={platformFilter} onChange={e => setPlatformFilter(e.target.value)} className="text-sm px-2 py-1 border border-border-dim bg-bg-secondary rounded w-full">
                 <option value="all">All Platforms</option>
                 {platforms.map(p => <option key={p} value={p}>{p}</option>)}
               </select>
-              <select value={themeFilter} onChange={e => setThemeFilter(e.target.value)} className="text-sm px-2 py-1 border border-border-dim bg-bg-secondary rounded">
+              <select value={themeFilter} onChange={e => setThemeFilter(e.target.value)} className="text-sm px-2 py-1 border border-border-dim bg-bg-secondary rounded w-full">
                 <option value="all">All Themes</option>
                 {themes.map(t => <option key={t} value={t}>{t}</option>)}
               </select>
             </div>
-            <ThemeToggle />
-            <button onClick={() => setShowNotifications(v => !v)} className="btn-ghost relative p-2 hover:text-accent-green">
-              🔔
-              {notifications.some(n => !n.is_read) && <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-accent-green animate-pulse" />}
-            </button>
-            <button onClick={() => setShowCreate(v => !v)} className={cn('btn-primary text-[11px] sm:text-sm px-2.5 sm:px-4', showCreate ? 'bg-accent-red hover:brightness-125' : '')}>{showCreate ? 'Close' : '+ Add'}</button>
-            <button onClick={() => setShowBulkImport(v => !v)} className={cn('btn-ghost hidden sm:inline-flex', showBulkImport ? 'text-accent-red' : '')}>Bulk Import</button>
-            <button onClick={async () => {
-              if (!window.confirm('Send email reminders to team members for rounds due in next 24 hours?')) return
-              try {
-                setSendingReminders(true)
-                const res = await fetch('/api/reminders/send', await authRequestInit({ method: 'POST' }))
-                const json = await res.json()
-                if (!res.ok) throw new Error(json.error || 'Failed to send reminders')
-                toast.success(`Sent ${json.data?.sent ?? 0} emails`)
-              } catch (err: any) {
-                toast.error(err?.message ?? 'Failed to send reminders')
-              } finally {
-                setSendingReminders(false)
-              }
-            }} className={cn('btn-ghost hidden lg:inline-flex', sendingReminders ? 'text-accent-green' : '')}>{sendingReminders ? 'Sending…' : 'Send Reminders'}</button>
-            <Link href="/" className="btn-ghost hidden sm:inline-flex hover:text-accent-blue">Home</Link>
           </div>
         </header>
 
