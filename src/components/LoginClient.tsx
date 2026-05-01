@@ -1,11 +1,34 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase'
 
 export default function LoginClient() {
   const [loading, setLoading] = useState(false)
+  const [checkingSession, setCheckingSession] = useState(true)
+  const router = useRouter()
   const supabase = createClient()
+
+  useEffect(() => {
+    let mounted = true
+
+    async function checkSession() {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!mounted) return
+      if (session) {
+        router.replace('/dashboard')
+        return
+      }
+      setCheckingSession(false)
+    }
+
+    void checkSession()
+
+    return () => {
+      mounted = false
+    }
+  }, [router, supabase])
 
   async function handleGoogleLogin() {
     setLoading(true)
@@ -65,10 +88,10 @@ export default function LoginClient() {
 
           <button
             onClick={handleGoogleLogin}
-            disabled={loading}
+            disabled={loading || checkingSession}
             className="w-full flex items-center justify-center gap-3 bg-white text-gray-800 font-semibold text-sm rounded-lg py-3 px-4 transition-all hover:bg-gray-100 active:scale-98 disabled:opacity-50"
           >
-            {loading ? (
+            {loading || checkingSession ? (
               <div className="w-4 h-4 border-2 border-gray-400 border-t-gray-800 rounded-full animate-spin"/>
             ) : (
               <svg width="18" height="18" viewBox="0 0 24 24">
@@ -78,7 +101,7 @@ export default function LoginClient() {
                 <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
               </svg>
             )}
-            {loading ? 'Redirecting...' : 'Continue with Google'}
+            {loading || checkingSession ? 'Redirecting...' : 'Continue with Google'}
           </button>
 
           <p className="text-center text-xs text-text-muted mt-4">
