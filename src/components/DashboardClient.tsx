@@ -582,7 +582,7 @@ export default function DashboardClient({ user, profile, initialHackathons, init
       {sidebarOpen && <div className="fixed inset-0 bg-black/40 z-30 sm:hidden" onClick={() => setSidebarOpen(false)} />}
 
       <aside className={cn(
-        sidebarOpen ? 'fixed left-0 top-0 z-40 h-full w-64' : 'hidden sm:flex',
+        sidebarOpen ? 'fixed left-0 top-0 z-40 h-full w-[min(20rem,88vw)]' : 'hidden sm:flex sm:w-64',
         'border-r border-border-dim bg-bg-tertiary flex flex-col'
       )}>
         <div className="p-4 border-b border-border-dim">
@@ -604,8 +604,8 @@ export default function DashboardClient({ user, profile, initialHackathons, init
           ] as { id: SidebarFilter; label: string; count: number }[]).map(item => (
             <button key={item.id} onClick={() => { setFilter(item.id); setSelectedId(null) }}
               className={cn('sidebar-item w-full justify-between', filter === item.id && !selectedId && 'active')}>
-              <span>{item.label}</span>
-              <span className="text-[10px] bg-bg-primary px-1.5 py-0.5 rounded-full text-text-muted">{item.count}</span>
+              <span className="min-w-0 flex-1 truncate text-left" title={item.label}>{item.label}</span>
+              <span className="shrink-0 text-[10px] bg-bg-primary px-1.5 py-0.5 rounded-full text-text-muted">{item.count}</span>
             </button>
           ))}
         </div>
@@ -615,7 +615,7 @@ export default function DashboardClient({ user, profile, initialHackathons, init
             <Avatar name={userName} url={profile?.avatar_url} size={36} />
             <div className="min-w-0">
               <div className="text-sm font-semibold truncate">{userName}</div>
-              <div className="text-[10px] text-text-muted truncate">{user.email}</div>
+              <div className="text-[10px] text-text-muted truncate" title={user.email ?? ''}>{user.email}</div>
             </div>
           </div>
           <form action="/auth/signout" method="post" className="w-full">
@@ -645,20 +645,20 @@ export default function DashboardClient({ user, profile, initialHackathons, init
       </aside>
 
       <main className="flex-1 overflow-y-auto">
-        <header className="sticky top-0 z-10 border-b border-border-mid bg-gradient-to-r from-bg-primary via-bg-secondary to-bg-primary/80 backdrop-blur px-6 py-4 flex items-center gap-3 justify-between">
+        <header className="sticky top-0 z-10 border-b border-border-mid bg-gradient-to-r from-bg-primary via-bg-secondary to-bg-primary/80 backdrop-blur px-3 sm:px-6 py-4 flex items-center gap-3 justify-between">
           <button className="sm:hidden p-2 text-xl" onClick={() => setSidebarOpen(v => !v)} aria-label="Toggle menu">☰</button>
           <div>
             <div className="text-xs tracking-[0.35em] text-accent-green font-bold">SIGNED IN</div>
-            <h1 className="text-2xl font-black mt-1 bg-gradient-to-r from-accent-green via-accent-blue to-accent-purple bg-clip-text text-transparent">HackTrack Dashboard</h1>
-            <p className="text-sm text-text-secondary mt-1">Welcome back, <span className="text-accent-green font-semibold">{user.email}</span>.</p>
+            <h1 className="text-xl sm:text-2xl font-black mt-1 bg-gradient-to-r from-accent-green via-accent-blue to-accent-purple bg-clip-text text-transparent">HackTrack Dashboard</h1>
+            <p className="text-xs sm:text-sm text-text-secondary mt-1">Welcome back, <span className="inline-block max-w-[42vw] sm:max-w-[26rem] align-bottom truncate text-accent-green font-semibold" title={user.email ?? ''}>{user.email}</span>.</p>
           </div>
 
-          <div className="flex items-center gap-3">
-            <div className="relative w-72 max-w-[40vw]">
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
+            <div className="relative w-40 sm:w-72 max-w-[45vw]">
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search hackathons..." className="pl-8 border-accent-green/30 focus:border-accent-green" />
               <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-accent-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="hidden md:flex items-center gap-2">
               <select value={sortBy} onChange={e => setSortBy(e.target.value as any)} className="text-sm px-2 py-1 border border-border-dim bg-bg-secondary rounded">
                 <option value="created">Sort: Newest</option>
                 <option value="deadline">Sort: Next Deadline</option>
@@ -679,8 +679,8 @@ export default function DashboardClient({ user, profile, initialHackathons, init
               🔔
               {notifications.some(n => !n.is_read) && <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-accent-green animate-pulse" />}
             </button>
-            <button onClick={() => setShowCreate(v => !v)} className={cn('btn-primary', showCreate ? 'bg-accent-red hover:brightness-125' : '')}>{showCreate ? 'Close' : '+ Add Hackathon'}</button>
-            <button onClick={() => setShowBulkImport(v => !v)} className={cn('btn-ghost', showBulkImport ? 'text-accent-red' : '')}>Bulk Import</button>
+            <button onClick={() => setShowCreate(v => !v)} className={cn('btn-primary text-xs sm:text-sm', showCreate ? 'bg-accent-red hover:brightness-125' : '')}>{showCreate ? 'Close' : '+ Add Hackathon'}</button>
+            <button onClick={() => setShowBulkImport(v => !v)} className={cn('btn-ghost hidden sm:inline-flex', showBulkImport ? 'text-accent-red' : '')}>Bulk Import</button>
             <button onClick={async () => {
               if (!window.confirm('Send email reminders to team members for rounds due in next 24 hours?')) return
               try {
@@ -694,8 +694,8 @@ export default function DashboardClient({ user, profile, initialHackathons, init
               } finally {
                 setSendingReminders(false)
               }
-            }} className={cn('btn-ghost', sendingReminders ? 'text-accent-green' : '')}>{sendingReminders ? 'Sending…' : 'Send Reminders'}</button>
-            <Link href="/" className="btn-ghost hover:text-accent-blue">Home</Link>
+            }} className={cn('btn-ghost hidden lg:inline-flex', sendingReminders ? 'text-accent-green' : '')}>{sendingReminders ? 'Sending…' : 'Send Reminders'}</button>
+            <Link href="/" className="btn-ghost hidden sm:inline-flex hover:text-accent-blue">Home</Link>
           </div>
         </header>
 
