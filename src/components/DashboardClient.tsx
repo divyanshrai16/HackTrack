@@ -205,6 +205,17 @@ export default function DashboardClient({ user, profile, initialHackathons, init
     }
   }, [router, user.id])
 
+  useEffect(() => {
+    if (!sidebarOpen) return
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setSidebarOpen(false)
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [sidebarOpen])
+
   async function handleDeleteHackathon(id: string) {
     try {
       if (!window.confirm('Delete this hackathon? This cannot be undone.')) return
@@ -578,81 +589,81 @@ export default function DashboardClient({ user, profile, initialHackathons, init
 
   return (
     <div className="flex min-h-screen overflow-x-hidden bg-bg-primary text-text-primary">
-      {/* Sidebar overlay backdrop */}
-      {sidebarOpen && <div className="fixed inset-0 bg-black/40 z-30" onClick={() => setSidebarOpen(false)} />}
+      {sidebarOpen && (
+        <>
+          <div className="fixed inset-0 z-30 bg-black/45 backdrop-blur-[1px]" onClick={() => setSidebarOpen(false)} />
 
-      <aside className={cn(
-        sidebarOpen ? 'fixed left-0 top-0 z-40 h-full w-[min(20rem,88vw)]' : 'hidden',
-        'overflow-y-auto border-r border-border-dim bg-bg-tertiary flex flex-col'
-      )}>
-        <div className="flex justify-end p-2 border-b border-border-dim">
-          <button
-            type="button"
-            onClick={() => setSidebarOpen(false)}
-            className="btn-ghost px-2 py-1 text-xs"
-            aria-label="Close menu"
-          >
-            Close ✕
-          </button>
-        </div>
-        <div className="p-4 border-b border-border-dim">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-accent-green text-black flex items-center justify-center font-black">H</div>
-            <div>
-              <div className="text-sm font-black tracking-widest text-accent-green">HACKTRACK</div>
-              <div className="text-[10px] tracking-[0.3em] text-text-muted">COMMAND CENTER</div>
+          <aside className="fixed left-0 top-0 z-40 h-full w-[min(20rem,88vw)] overflow-y-auto border-r border-border-dim bg-bg-tertiary flex flex-col shadow-2xl">
+            <div className="flex justify-end p-2 border-b border-border-dim">
+              <button
+                type="button"
+                onClick={() => setSidebarOpen(false)}
+                className="btn-ghost px-2 py-1 text-xs"
+                aria-label="Close menu"
+              >
+                Close ✕
+              </button>
             </div>
-          </div>
-        </div>
-
-        <div className="p-3 space-y-1 border-b border-border-dim">
-          {([
-            { id: 'all', label: 'All Hackathons', count: stats.total },
-            { id: 'active', label: 'Active', count: stats.active },
-            { id: 'upcoming', label: 'Upcoming', count: stats.upcoming },
-            { id: 'completed', label: 'Completed', count: stats.completed },
-          ] as { id: SidebarFilter; label: string; count: number }[]).map(item => (
-            <button key={item.id} onClick={() => { setFilter(item.id); setSelectedId(null); setSidebarOpen(false) }}
-              className={cn('sidebar-item w-full justify-between', filter === item.id && !selectedId && 'active')}>
-              <span className="min-w-0 flex-1 truncate text-left" title={item.label}>{item.label}</span>
-              <span className="shrink-0 text-[10px] bg-bg-primary px-1.5 py-0.5 rounded-full text-text-muted">{item.count}</span>
-            </button>
-          ))}
-        </div>
-
-        <div className="p-4 space-y-3 border-b border-border-dim">
-          <div className="flex items-center gap-2">
-            <Avatar name={userName} url={profile?.avatar_url} size={36} />
-            <div className="min-w-0">
-              <div className="text-sm font-semibold truncate">{userName}</div>
-              <div className="text-[10px] text-text-muted truncate" title={user.email ?? ''}>{user.email}</div>
-            </div>
-          </div>
-          <form action="/auth/signout" method="post" className="w-full">
-            <button
-              type="submit"
-              className="sidebar-item w-full text-left text-text-muted hover:text-accent-red"
-            >
-              Sign out
-            </button>
-          </form>
-        </div>
-
-        <div className="p-4">
-          <div className="text-[10px] tracking-[0.3em] text-text-muted mb-2">URGENT DEADLINES</div>
-          <div className="space-y-2">
-            {urgentRounds.length === 0 ? (
-              <div className="text-xs text-text-muted">All clear.</div>
-            ) : urgentRounds.map(({ hackathon, round }) => (
-              <div key={round.id} className="rounded-xl border border-amber-800/30 bg-amber-950/20 p-2">
-                <div className="text-[10px] text-text-secondary truncate">{hackathon.name}</div>
-                <div className="text-[11px] text-amber-300 truncate">{round.name}</div>
-                <div className="mt-1"><Pill tone="amber">{getCountdown(round.deadline).label}</Pill></div>
+            <div className="p-4 border-b border-border-dim">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-accent-green text-black flex items-center justify-center font-black">H</div>
+                <div>
+                  <div className="text-sm font-black tracking-widest text-accent-green">HACKTRACK</div>
+                  <div className="text-[10px] tracking-[0.3em] text-text-muted">COMMAND CENTER</div>
+                </div>
               </div>
-            ))}
-          </div>
-        </div>
-      </aside>
+            </div>
+
+            <div className="p-3 space-y-1 border-b border-border-dim">
+              {([
+                { id: 'all', label: 'All Hackathons', count: stats.total },
+                { id: 'active', label: 'Active', count: stats.active },
+                { id: 'upcoming', label: 'Upcoming', count: stats.upcoming },
+                { id: 'completed', label: 'Completed', count: stats.completed },
+              ] as { id: SidebarFilter; label: string; count: number }[]).map(item => (
+                <button key={item.id} onClick={() => { setFilter(item.id); setSelectedId(null); setSidebarOpen(false) }}
+                  className={cn('sidebar-item w-full justify-between', filter === item.id && !selectedId && 'active')}>
+                  <span className="min-w-0 flex-1 truncate text-left" title={item.label}>{item.label}</span>
+                  <span className="shrink-0 text-[10px] bg-bg-primary px-1.5 py-0.5 rounded-full text-text-muted">{item.count}</span>
+                </button>
+              ))}
+            </div>
+
+            <div className="p-4 space-y-3 border-b border-border-dim">
+              <div className="flex items-center gap-2">
+                <Avatar name={userName} url={profile?.avatar_url} size={36} />
+                <div className="min-w-0">
+                  <div className="text-sm font-semibold truncate">{userName}</div>
+                  <div className="text-[10px] text-text-muted truncate" title={user.email ?? ''}>{user.email}</div>
+                </div>
+              </div>
+              <form action="/auth/signout" method="post" className="w-full">
+                <button
+                  type="submit"
+                  className="sidebar-item w-full text-left text-text-muted hover:text-accent-red"
+                >
+                  Sign out
+                </button>
+              </form>
+            </div>
+
+            <div className="p-4">
+              <div className="text-[10px] tracking-[0.3em] text-text-muted mb-2">URGENT DEADLINES</div>
+              <div className="space-y-2">
+                {urgentRounds.length === 0 ? (
+                  <div className="text-xs text-text-muted">All clear.</div>
+                ) : urgentRounds.map(({ hackathon, round }) => (
+                  <div key={round.id} className="rounded-xl border border-amber-800/30 bg-amber-950/20 p-2">
+                    <div className="text-[10px] text-text-secondary truncate">{hackathon.name}</div>
+                    <div className="text-[11px] text-amber-300 truncate">{round.name}</div>
+                    <div className="mt-1"><Pill tone="amber">{getCountdown(round.deadline).label}</Pill></div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </aside>
+        </>
+      )}
 
       <main className="min-w-0 flex-1 overflow-y-auto">
         <header className="sticky top-0 z-10 border-b border-border-mid bg-gradient-to-r from-bg-primary via-bg-secondary to-bg-primary/80 backdrop-blur px-3 sm:px-6 py-4 flex items-start gap-3 justify-between">
