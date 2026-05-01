@@ -578,13 +578,23 @@ export default function DashboardClient({ user, profile, initialHackathons, init
 
   return (
     <div className="flex min-h-screen overflow-x-hidden bg-bg-primary text-text-primary">
-      {/* Mobile overlay backdrop */}
-      {sidebarOpen && <div className="fixed inset-0 bg-black/40 z-30 sm:hidden" onClick={() => setSidebarOpen(false)} />}
+      {/* Sidebar overlay backdrop */}
+      {sidebarOpen && <div className="fixed inset-0 bg-black/40 z-30" onClick={() => setSidebarOpen(false)} />}
 
       <aside className={cn(
-        sidebarOpen ? 'fixed left-0 top-0 z-40 h-full w-[min(20rem,88vw)]' : 'hidden sm:flex sm:w-64',
+        sidebarOpen ? 'fixed left-0 top-0 z-40 h-full w-[min(20rem,88vw)]' : 'hidden',
         'overflow-y-auto border-r border-border-dim bg-bg-tertiary flex flex-col'
       )}>
+        <div className="flex justify-end p-2 border-b border-border-dim">
+          <button
+            type="button"
+            onClick={() => setSidebarOpen(false)}
+            className="btn-ghost px-2 py-1 text-xs"
+            aria-label="Close menu"
+          >
+            Close ✕
+          </button>
+        </div>
         <div className="p-4 border-b border-border-dim">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-accent-green text-black flex items-center justify-center font-black">H</div>
@@ -602,7 +612,7 @@ export default function DashboardClient({ user, profile, initialHackathons, init
             { id: 'upcoming', label: 'Upcoming', count: stats.upcoming },
             { id: 'completed', label: 'Completed', count: stats.completed },
           ] as { id: SidebarFilter; label: string; count: number }[]).map(item => (
-            <button key={item.id} onClick={() => { setFilter(item.id); setSelectedId(null) }}
+            <button key={item.id} onClick={() => { setFilter(item.id); setSelectedId(null); setSidebarOpen(false) }}
               className={cn('sidebar-item w-full justify-between', filter === item.id && !selectedId && 'active')}>
               <span className="min-w-0 flex-1 truncate text-left" title={item.label}>{item.label}</span>
               <span className="shrink-0 text-[10px] bg-bg-primary px-1.5 py-0.5 rounded-full text-text-muted">{item.count}</span>
@@ -646,7 +656,7 @@ export default function DashboardClient({ user, profile, initialHackathons, init
 
       <main className="min-w-0 flex-1 overflow-y-auto">
         <header className="sticky top-0 z-10 border-b border-border-mid bg-gradient-to-r from-bg-primary via-bg-secondary to-bg-primary/80 backdrop-blur px-3 sm:px-6 py-4 flex items-start gap-3 justify-between">
-          <button className="sm:hidden p-2 text-xl" onClick={() => setSidebarOpen(v => !v)} aria-label="Toggle menu">☰</button>
+          <button className="p-2 text-xl" onClick={() => setSidebarOpen(v => !v)} aria-label="Toggle menu">☰</button>
           <div className="min-w-0">
             <div className="text-xs tracking-[0.35em] text-accent-green font-bold">SIGNED IN</div>
             <h1 className="text-xl sm:text-2xl font-black mt-1 bg-gradient-to-r from-accent-green via-accent-blue to-accent-purple bg-clip-text text-transparent">HackTrack Dashboard</h1>
