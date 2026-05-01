@@ -41,11 +41,11 @@ export default function ProfilePage({}: {}) {
   }
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="px-4 py-6 sm:p-6">
+      <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Profile Settings</h1>
-          <p className="text-sm text-text-secondary">Update your display name, avatar and bio.</p>
+          <h1 className="text-xl sm:text-2xl font-bold">Profile Settings</h1>
+          <p className="text-xs sm:text-sm text-text-secondary">Update your display name, avatar and bio.</p>
         </div>
         <div className="flex items-center gap-3">
           <ThemeToggle />
@@ -63,7 +63,7 @@ export default function ProfilePage({}: {}) {
         <label className="block text-sm text-text-muted mb-1">Bio</label>
         <textarea value={bio} onChange={e => setBio(e.target.value)} placeholder="A short bio" className="mb-4 h-24" />
 
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button onClick={handleSave} className="btn-primary" disabled={saving}>{saving ? 'Saving...' : 'Save Profile'}</button>
           <button onClick={() => { setName(''); setAvatar(''); setBio('') }} className="btn-ghost">Reset</button>
         </div>

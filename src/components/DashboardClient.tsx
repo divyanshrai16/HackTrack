@@ -577,13 +577,13 @@ export default function DashboardClient({ user, profile, initialHackathons, init
   }
 
   return (
-    <div className="flex min-h-screen bg-bg-primary text-text-primary">
+    <div className="flex min-h-screen overflow-x-hidden bg-bg-primary text-text-primary">
       {/* Mobile overlay backdrop */}
       {sidebarOpen && <div className="fixed inset-0 bg-black/40 z-30 sm:hidden" onClick={() => setSidebarOpen(false)} />}
 
       <aside className={cn(
         sidebarOpen ? 'fixed left-0 top-0 z-40 h-full w-[min(20rem,88vw)]' : 'hidden sm:flex sm:w-64',
-        'border-r border-border-dim bg-bg-tertiary flex flex-col'
+        'overflow-y-auto border-r border-border-dim bg-bg-tertiary flex flex-col'
       )}>
         <div className="p-4 border-b border-border-dim">
           <div className="flex items-center gap-3">
@@ -644,17 +644,17 @@ export default function DashboardClient({ user, profile, initialHackathons, init
         </div>
       </aside>
 
-      <main className="flex-1 overflow-y-auto">
-        <header className="sticky top-0 z-10 border-b border-border-mid bg-gradient-to-r from-bg-primary via-bg-secondary to-bg-primary/80 backdrop-blur px-3 sm:px-6 py-4 flex items-center gap-3 justify-between">
+      <main className="min-w-0 flex-1 overflow-y-auto">
+        <header className="sticky top-0 z-10 border-b border-border-mid bg-gradient-to-r from-bg-primary via-bg-secondary to-bg-primary/80 backdrop-blur px-3 sm:px-6 py-4 flex items-start gap-3 justify-between">
           <button className="sm:hidden p-2 text-xl" onClick={() => setSidebarOpen(v => !v)} aria-label="Toggle menu">☰</button>
-          <div>
+          <div className="min-w-0">
             <div className="text-xs tracking-[0.35em] text-accent-green font-bold">SIGNED IN</div>
             <h1 className="text-xl sm:text-2xl font-black mt-1 bg-gradient-to-r from-accent-green via-accent-blue to-accent-purple bg-clip-text text-transparent">HackTrack Dashboard</h1>
-            <p className="text-xs sm:text-sm text-text-secondary mt-1">Welcome back, <span className="inline-block max-w-[42vw] sm:max-w-[26rem] align-bottom truncate text-accent-green font-semibold" title={user.email ?? ''}>{user.email}</span>.</p>
+            <p className="text-xs sm:text-sm text-text-secondary mt-1">Welcome back, <span className="inline-block max-w-[32vw] sm:max-w-[26rem] align-bottom truncate text-accent-green font-semibold" title={user.email ?? ''}>{user.email}</span>.</p>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end">
-            <div className="relative w-40 sm:w-72 max-w-[45vw]">
+          <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-end shrink-0">
+            <div className="relative w-36 sm:w-72 max-w-[42vw]">
               <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search hackathons..." className="pl-8 border-accent-green/30 focus:border-accent-green" />
               <svg className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-accent-green" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}><circle cx="11" cy="11" r="8" /><path d="m21 21-4.35-4.35" /></svg>
             </div>
@@ -679,7 +679,7 @@ export default function DashboardClient({ user, profile, initialHackathons, init
               🔔
               {notifications.some(n => !n.is_read) && <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-accent-green animate-pulse" />}
             </button>
-            <button onClick={() => setShowCreate(v => !v)} className={cn('btn-primary text-xs sm:text-sm', showCreate ? 'bg-accent-red hover:brightness-125' : '')}>{showCreate ? 'Close' : '+ Add Hackathon'}</button>
+            <button onClick={() => setShowCreate(v => !v)} className={cn('btn-primary text-[11px] sm:text-sm px-2.5 sm:px-4', showCreate ? 'bg-accent-red hover:brightness-125' : '')}>{showCreate ? 'Close' : '+ Add'}</button>
             <button onClick={() => setShowBulkImport(v => !v)} className={cn('btn-ghost hidden sm:inline-flex', showBulkImport ? 'text-accent-red' : '')}>Bulk Import</button>
             <button onClick={async () => {
               if (!window.confirm('Send email reminders to team members for rounds due in next 24 hours?')) return
@@ -700,7 +700,7 @@ export default function DashboardClient({ user, profile, initialHackathons, init
         </header>
 
         {showNotifications && (
-          <div className="absolute right-6 top-20 z-20 w-80 max-w-[calc(100vw-3rem)]">
+          <div className="absolute right-2 sm:right-6 top-16 sm:top-20 z-20 w-[calc(100vw-1rem)] sm:w-80 max-w-[calc(100vw-1rem)] sm:max-w-[calc(100vw-3rem)]">
             <Card>
               <div className="flex items-center justify-between mb-3">
                 <div className="text-xs tracking-[0.3em] text-text-muted">NOTIFICATIONS</div>
@@ -721,7 +721,7 @@ export default function DashboardClient({ user, profile, initialHackathons, init
           </div>
         )}
 
-        <div className="px-6 py-6 space-y-6">
+        <div className="px-3 sm:px-6 py-4 sm:py-6 space-y-4 sm:space-y-6">
           {showCreate && (
             <Card>
               <div className="text-xs tracking-[0.3em] text-accent-green">CREATE HACKATHON</div>
@@ -773,7 +773,7 @@ export default function DashboardClient({ user, profile, initialHackathons, init
                 <div className="text-xs text-text-muted">Paste one entry per line — format: <em>name|organizer|platform|theme|color</em></div>
               </div>
               <textarea value={bulkInput} onChange={e => setBulkInput(e.target.value)} placeholder={`Hackathon A|Org A|Devfolio|AI/ML|#00d4aa\nHackathon B|Org B|Unstop|Web3|#8b5cf6`} className="w-full h-40 p-3 bg-bg-secondary border-border-dim" />
-              <div className="mt-3 flex justify-end gap-2">
+              <div className="mt-3 flex flex-wrap justify-end gap-2">
                 <button onClick={() => { setShowBulkImport(false); setBulkInput('') }} className="btn-ghost">Cancel</button>
                 <button onClick={handleBulkImport} disabled={bulkImporting} className="btn-primary">{bulkImporting ? 'Importing...' : 'Import'}</button>
               </div>
@@ -815,7 +815,7 @@ export default function DashboardClient({ user, profile, initialHackathons, init
                   placeholder="Color (e.g. #00d4aa)" 
                 />
               </div>
-              <div className="mt-4 flex justify-end gap-2">
+              <div className="mt-4 flex flex-wrap justify-end gap-2">
                 <button onClick={() => setShowEdit(false)} className="btn-ghost" disabled={editing}>
                   Cancel
                 </button>
@@ -836,9 +836,9 @@ export default function DashboardClient({ user, profile, initialHackathons, init
                   { label: 'Tasks completed', value: `${doneTasks}/${selected?.tasks.length ?? 3}`, detail: 'today', color: 'from-purple-500/20 to-pink-500/20', textColor: 'text-purple-400' },
                 ].map((item, i) => (
                   <Card key={item.label} className={`bg-gradient-to-br ${item.color} border-border-mid hover:border-accent-green/50`}>
-                    <div className="text-[10px] uppercase tracking-[0.3em] text-text-muted">{item.label}</div>
-                    <div className={cn('mt-3 text-4xl font-black', item.textColor)}>{item.value}</div>
-                    <div className="mt-2 text-sm text-text-secondary">{item.detail}</div>
+                    <div className="text-[10px] uppercase tracking-[0.28em] text-text-muted">{item.label}</div>
+                    <div className={cn('mt-2 sm:mt-3 text-3xl sm:text-4xl font-black break-words', item.textColor)}>{item.value}</div>
+                    <div className="mt-1.5 sm:mt-2 text-xs sm:text-sm text-text-secondary break-words">{item.detail}</div>
                   </Card>
                 ))}
               </section>
@@ -896,24 +896,24 @@ export default function DashboardClient({ user, profile, initialHackathons, init
           ) : (
             <section className="grid gap-4 xl:grid-cols-[2fr_1fr]">
               <Card>
-                <div className="flex items-start justify-between gap-3 mb-4">
-                  <div>
+                <div className="flex flex-col sm:flex-row items-start justify-between gap-3 mb-4">
+                  <div className="min-w-0">
                     <div className="text-xs tracking-[0.3em] text-accent-green font-bold">SIGNED IN</div>
-                    <h2 className="text-2xl font-black mt-1 bg-gradient-to-r from-accent-green to-accent-blue bg-clip-text text-transparent">{selected.name}</h2>
-                    <div className="text-sm text-text-secondary mt-1">{selected.organizer} • <span className="text-accent-purple">{selected.platform}</span></div>
+                    <h2 className="text-xl sm:text-2xl font-black mt-1 bg-gradient-to-r from-accent-green to-accent-blue bg-clip-text text-transparent break-words">{selected.name}</h2>
+                    <div className="text-xs sm:text-sm text-text-secondary mt-1 break-words">{selected.organizer} • <span className="text-accent-purple">{selected.platform}</span></div>
                   </div>
-                  <div className="flex gap-2">
-                    <button className="btn-ghost hover:text-accent-blue" onClick={() => setSelectedId(null)}>← Back</button>
+                  <div className="flex flex-wrap gap-2 w-full sm:w-auto">
+                    <button className="btn-ghost hover:text-accent-blue text-xs" onClick={() => setSelectedId(null)}>← Back</button>
                     {isOwner && (
                       <>
                         <button
-                          className="px-4 py-2 rounded-md text-sm font-bold transition-all bg-accent-blue text-white hover:brightness-110 border border-accent-blue"
+                          className="px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-bold transition-all bg-accent-blue text-white hover:brightness-110 border border-accent-blue"
                           onClick={openEditModal}
                         >
                           ✏️ Edit
                         </button>
                         <button
-                          className="px-4 py-2 rounded-md text-sm font-bold transition-all bg-accent-purple text-white hover:brightness-110 border border-accent-purple"
+                          className="px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-bold transition-all bg-accent-purple text-white hover:brightness-110 border border-accent-purple"
                           onClick={() => handleCloneHackathon(selected.id)}
                         >
                           📋 Clone
@@ -922,7 +922,7 @@ export default function DashboardClient({ user, profile, initialHackathons, init
                     )}
                     <button 
                       className={cn(
-                        'px-4 py-2 rounded-md text-sm font-bold transition-all',
+                        'px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-bold transition-all',
                         isOwner 
                           ? 'bg-accent-red text-white hover:brightness-110 border border-accent-red' 
                           : 'bg-gray-600 text-gray-400 cursor-not-allowed opacity-50 border border-gray-700'
@@ -936,7 +936,7 @@ export default function DashboardClient({ user, profile, initialHackathons, init
                   </div>
                 </div>
 
-                <div className="grid sm:grid-cols-4 gap-3 mb-4">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
                   {[
                     { label: 'Rounds', value: selected.rounds.length, icon: '📍' },
                     { label: 'Team', value: selected.team_members.length, icon: '👥' },
@@ -955,17 +955,17 @@ export default function DashboardClient({ user, profile, initialHackathons, init
                   <div className="text-xs tracking-[0.3em] text-text-muted font-bold">⏱ ROUND TIMELINE</div>
                   {selected.rounds.map((r, idx) => (
                     <div key={r.id} className="rounded-xl border-2 border-border-mid bg-gradient-to-r from-bg-secondary via-bg-tertiary to-bg-secondary p-4 hover:border-accent-green/50 transition-colors" style={{ borderLeftColor: idx % 2 === 0 ? '#00d4aa' : '#8b5cf6' }}>
-                      <div className="flex items-center justify-between gap-3">
-                        <div>
-                          <div className="font-semibold text-lg flex items-center gap-2">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div className="min-w-0">
+                          <div className="font-semibold text-base sm:text-lg flex items-center gap-2 min-w-0">
                             <span style={{ color: ['#00d4aa', '#0ea5e9', '#8b5cf6', '#f59e0b', '#f87171'][idx % 5] }}>●</span>
-                            {r.name}
+                            <span className="truncate">{r.name}</span>
                           </div>
                           <div className="text-xs text-text-secondary mt-1 font-mono">{formatDeadline(r.deadline)}</div>
                         </div>
-                        <div className="flex items-center gap-2">
+                        <div className="flex flex-wrap items-center gap-2">
                           <Pill tone={r.status === 'submitted' ? 'green' : r.status === 'cleared' ? 'amber' : 'default'}>{r.status}</Pill>
-                          <div className="flex gap-1">
+                          <div className="flex flex-wrap gap-1">
                             <button className="btn-ghost text-[10px] px-2 py-1 hover:text-accent-blue" onClick={() => handleUpdateRoundStatus(r.id, 'pending')}>Pending</button>
                             <button className="btn-ghost text-[10px] px-2 py-1 hover:text-accent-green" onClick={() => handleUpdateRoundStatus(r.id, 'submitted')}>Submitted</button>
                             <button className="btn-ghost text-[10px] px-2 py-1 hover:text-accent-amber" onClick={() => handleUpdateRoundStatus(r.id, 'cleared')}>Cleared</button>
@@ -987,14 +987,14 @@ export default function DashboardClient({ user, profile, initialHackathons, init
                   {isOwner && (
                     <div className="mt-4 space-y-2 rounded-xl border-2 border-accent-green/30 bg-emerald-950/20 p-3">
                       <div className="text-[10px] tracking-[0.3em] text-accent-green">INVITE BY EMAIL</div>
-                      <div className="flex gap-2">
+                      <div className="flex flex-col sm:flex-row gap-2">
                         <input
                           value={inviteEmail}
                           onChange={e => setInviteEmail(e.target.value)}
                           placeholder="teammate@gmail.com"
                           className="flex-1 border-accent-green/50"
                         />
-                        <select value={inviteRole} onChange={e => setInviteRole(e.target.value)} className="w-32 border-accent-green/50">
+                        <select value={inviteRole} onChange={e => setInviteRole(e.target.value)} className="w-full sm:w-32 border-accent-green/50">
                           <option>Member</option>
                           <option>Frontend</option>
                           <option>Backend</option>
@@ -1037,9 +1037,9 @@ export default function DashboardClient({ user, profile, initialHackathons, init
                 <Card className="border-2 border-blue-900/40 bg-gradient-to-br from-blue-950/30 to-bg-secondary">
                   <div className="text-xs tracking-[0.3em] text-accent-blue font-bold">🔗 RESOURCES</div>
                   <div className="mt-3 space-y-2 text-sm text-text-secondary">
-                    <div className="flex items-center gap-2"><span className="text-accent-green">•</span> GitHub: <span className="text-accent-blue">{selected.resources?.github_url ?? 'not set'}</span></div>
-                    <div className="flex items-center gap-2"><span className="text-accent-purple">•</span> Figma: <span className="text-accent-purple">{selected.resources?.figma_url ?? 'not set'}</span></div>
-                    <div className="flex items-center gap-2"><span className="text-accent-amber">•</span> Slides: <span className="text-accent-amber">{selected.resources?.presentation_url ?? 'not set'}</span></div>
+                    <div className="flex items-start gap-2"><span className="text-accent-green">•</span><span className="min-w-0 truncate">GitHub: <span className="text-accent-blue">{selected.resources?.github_url ?? 'not set'}</span></span></div>
+                    <div className="flex items-start gap-2"><span className="text-accent-purple">•</span><span className="min-w-0 truncate">Figma: <span className="text-accent-purple">{selected.resources?.figma_url ?? 'not set'}</span></span></div>
+                    <div className="flex items-start gap-2"><span className="text-accent-amber">•</span><span className="min-w-0 truncate">Slides: <span className="text-accent-amber">{selected.resources?.presentation_url ?? 'not set'}</span></span></div>
                   </div>
                 </Card>
 

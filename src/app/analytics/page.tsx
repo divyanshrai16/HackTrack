@@ -32,14 +32,14 @@ export default function AnalyticsPage() {
     return { total, avgTasks, completion, byStatus, upcoming }
   }, [hackathons])
 
-  if (loading) return <div className="p-6">Loading analytics…</div>
+  if (loading) return <div className="px-4 py-6 sm:p-6">Loading analytics…</div>
 
   return (
-    <div className="p-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="px-4 py-6 sm:p-6">
+      <div className="flex flex-wrap items-start justify-between gap-3 mb-6">
         <div>
-          <h1 className="text-2xl font-bold">Analytics</h1>
-          <p className="text-sm text-text-secondary">Overview of your hackathons and team activity.</p>
+          <h1 className="text-xl sm:text-2xl font-bold">Analytics</h1>
+          <p className="text-xs sm:text-sm text-text-secondary">Overview of your hackathons and team activity.</p>
         </div>
         <div className="flex items-center gap-3"><ThemeToggle /></div>
       </div>
@@ -81,12 +81,12 @@ export default function AnalyticsPage() {
           <div className="text-xs text-text-muted mb-3">Upcoming Rounds</div>
           <div className="space-y-3 max-h-60 overflow-auto">
             {hackathons.flatMap(h => (h.rounds || []).map((r:any) => ({ hackathon: h, round: r }))).slice(0, 20).map((x:any, i:number) => (
-              <div key={i} className="rounded-lg border border-border-dim p-3 flex items-center justify-between">
-                <div>
-                  <div className="font-semibold">{x.hackathon.name}</div>
-                  <div className="text-xs text-text-muted">{x.round.name} • {formatDeadline(x.round.deadline)}</div>
+              <div key={i} className="rounded-lg border border-border-dim p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="min-w-0">
+                  <div className="font-semibold truncate">{x.hackathon.name}</div>
+                  <div className="text-xs text-text-muted break-words">{x.round.name} • {formatDeadline(x.round.deadline)}</div>
                 </div>
-                <div className="text-sm text-text-secondary">{new Date(x.round.deadline).toLocaleString()}</div>
+                <div className="text-xs sm:text-sm text-text-secondary">{new Date(x.round.deadline).toLocaleString()}</div>
               </div>
             ))}
             {hackathons.length === 0 && <div className="text-sm text-text-muted">No upcoming rounds</div>}

@@ -23,7 +23,7 @@ export default function Loading() {
       </aside>
 
       <main className="flex-1 overflow-hidden">
-        <header className="sticky top-0 z-10 border-b border-border-dim bg-bg-primary/90 backdrop-blur px-6 py-4 flex items-center justify-between gap-4">
+        <header className="sticky top-0 z-10 border-b border-border-dim bg-bg-primary/90 backdrop-blur px-3 sm:px-6 py-4 flex items-center justify-between gap-4">
           <div className="space-y-2">
             <div className="h-3 w-24 rounded-full bg-border-mid animate-pulse" />
             <div className="h-7 w-56 rounded-full bg-border-mid/80 animate-pulse" />
@@ -38,7 +38,7 @@ export default function Loading() {
           </div>
         </header>
 
-        <div className="px-6 py-6 space-y-6">
+        <div className="px-3 sm:px-6 py-4 sm:py-6 space-y-6">
           <section className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
             {Array.from({ length: 4 }).map((_, index) => (
               <div key={index} className="rounded-2xl border border-border-dim bg-bg-secondary p-4 space-y-3 animate-pulse">

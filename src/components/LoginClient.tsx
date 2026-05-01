@@ -42,17 +42,17 @@ export default function LoginClient() {
   }
 
   return (
-    <div className="min-h-screen bg-bg-primary flex flex-col items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-bg-primary flex flex-col items-center justify-center px-4 py-6 sm:py-10 relative overflow-hidden">
       <div className="absolute inset-0 opacity-5" style={{
         backgroundImage: 'linear-gradient(#00d4aa 1px, transparent 1px), linear-gradient(90deg, #00d4aa 1px, transparent 1px)',
         backgroundSize: '40px 40px',
       }}/>
 
-      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full opacity-5"
+      <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 sm:w-96 sm:h-96 rounded-full opacity-5"
         style={{ background: 'radial-gradient(circle, #00d4aa, transparent 70%)' }}/>
 
       <div className="relative z-10 w-full max-w-md animate-fade-in">
-        <div className="flex items-center gap-3 justify-center mb-12">
+        <div className="flex items-center gap-3 justify-center mb-8 sm:mb-12">
           <div className="w-10 h-10 bg-accent-green rounded-lg flex items-center justify-center font-black text-black text-lg">H</div>
           <div>
             <div className="text-xl font-black text-accent-green tracking-widest">HACKTRACK</div>
@@ -60,21 +60,21 @@ export default function LoginClient() {
           </div>
         </div>
 
-        <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-text-primary mb-3 leading-tight">
+        <div className="text-center mb-8 sm:mb-10">
+          <h1 className="text-2xl sm:text-3xl font-bold text-text-primary mb-3 leading-tight">
             Never miss a<br/>
             <span className="text-accent-green">hackathon deadline</span><br/>
             again.
           </h1>
-          <p className="text-text-secondary text-sm leading-relaxed max-w-sm mx-auto">
+          <p className="text-text-secondary text-xs sm:text-sm leading-relaxed max-w-sm mx-auto">
             Centralized command center for hackathons — multi-round tracking,
             team sync, resource vault, and smart reminders.
           </p>
         </div>
 
-        <div className="flex flex-wrap gap-2 justify-center mb-10">
+        <div className="flex flex-wrap gap-2 justify-center mb-8 sm:mb-10">
           {['Multi-round tracking', 'Team sync', 'Smart reminders', 'Resource vault', 'Kanban tasks'].map(f => (
-            <span key={f} className="tag" style={{ background: '#0a2e1e', color: '#00d4aa' }}>
+            <span key={f} className="tag text-[10px] sm:text-xs" style={{ background: '#0a2e1e', color: '#00d4aa' }}>
               {f}
             </span>
           ))}
