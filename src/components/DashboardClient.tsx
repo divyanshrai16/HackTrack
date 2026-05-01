@@ -618,7 +618,14 @@ export default function DashboardClient({ user, profile, initialHackathons, init
               <div className="text-[10px] text-text-muted truncate">{user.email}</div>
             </div>
           </div>
-          <Link href="/auth/signout" className="sidebar-item w-full text-text-muted hover:text-accent-red">Sign out</Link>
+          <form action="/auth/signout" method="post" className="w-full">
+            <button
+              type="submit"
+              className="sidebar-item w-full text-left text-text-muted hover:text-accent-red"
+            >
+              Sign out
+            </button>
+          </form>
         </div>
 
         <div className="p-4">

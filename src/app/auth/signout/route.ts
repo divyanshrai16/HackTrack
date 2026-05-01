@@ -1,7 +1,7 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
   const response = NextResponse.redirect(new URL('/', request.url))
 
   const supabase = createServerClient(
@@ -24,4 +24,8 @@ export async function GET(request: NextRequest) {
   await supabase.auth.signOut()
 
   return response
+}
+
+export async function GET() {
+  return NextResponse.json({ error: 'Method Not Allowed' }, { status: 405 })
 }
